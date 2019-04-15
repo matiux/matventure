@@ -1,0 +1,24 @@
+version: '3.7'
+
+# volumes:
+#   app_database: {}
+#   app_cache: {}
+#   app_redis: {}
+
+networks:
+  app_net:
+    driver: bridge
+    name: app_net
+
+services:
+
+  golang:
+    build: golang
+    container_name: matventure
+    volumes:
+      - ../:/home/utente/matventure
+      - ./data/shell_history:/home/utente/shell_history
+    networks:
+      - app_net
+    environment:
+      - HISTFILE=/home/utente/shell_history/.zsh_history
