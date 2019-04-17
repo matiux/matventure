@@ -1,3 +1,0 @@
-#alias
-alias app="cd /home/utente/matventure"
-alias ll="ls -alhF"
