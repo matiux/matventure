@@ -16,16 +16,66 @@ import (
 var Spritesheet *common.Spritesheet
 
 var cities = [...][12]int{
-	{99, 100, 101, 454, 269, 455, 415, 195, 416, 452, 306, 453},
-	{99, 100, 101, 268, 269, 270, 268, 269, 270, 305, 306, 307},
-	{75, 76, 77, 446, 261, 447, 446, 261, 447, 444, 298, 445},
-	{75, 76, 77, 407, 187, 408, 407, 187, 408, 444, 298, 445},
-	{75, 76, 77, 186, 150, 188, 186, 150, 188, 297, 191, 299},
-	{83, 84, 85, 413, 228, 414, 411, 191, 412, 448, 302, 449},
-	{83, 84, 85, 227, 228, 229, 190, 191, 192, 301, 302, 303},
-	{91, 92, 93, 241, 242, 243, 278, 279, 280, 945, 946, 947},
-	{91, 92, 93, 241, 242, 243, 278, 279, 280, 945, 803, 947},
-	{91, 92, 93, 238, 239, 240, 238, 239, 240, 312, 313, 314},
+	{
+		99, 100, 101,
+		454, 269, 455,
+		415, 195, 416,
+		452, 306, 453,
+	},
+	{
+		99, 100, 101,
+		268, 269, 270,
+		268, 269, 270,
+		305, 306, 307,
+	},
+	{
+		75, 76, 77,
+		446, 261, 447,
+		446, 261, 447,
+		444, 298, 445,
+	},
+	{
+		75, 76, 77,
+		407, 187, 408,
+		407, 187, 408,
+		444, 298, 445,
+	},
+	{
+		75, 76, 77,
+		186, 150, 188,
+		186, 150, 188,
+		297, 191, 299,
+	},
+	{
+		83, 84, 85,
+		413, 228, 414,
+		411, 191, 412,
+		448, 302, 449,
+	},
+	{
+		83, 84, 85,
+		227, 228, 229,
+		190, 191, 192,
+		301, 302, 303,
+	},
+	{
+		91, 92, 93,
+		241, 242, 243,
+		278, 279, 280,
+		945, 946, 947,
+	},
+	{
+		91, 92, 93,
+		241, 242, 243,
+		278, 279, 280,
+		945, 803, 947,
+	},
+	{
+		91, 92, 93,
+		238, 239, 240,
+		238, 239, 240,
+		312, 313, 314,
+	},
 }
 
 // type MouseTracker struct {
@@ -61,53 +111,6 @@ func (cb *CityBuildingSystem) Update(dt float32) {
 		cb.updateBuildTime()
 		cb.built++
 	}
-
-	//if engo.Input.Button("AddCity").JustPressed() {
-	//	fmt.Println("The gamer pressed F1")
-	//
-	//	// Creazione dell'Entity
-	//	city := entities.City{BasicEntity: ecs.NewBasic()}
-	//
-	//	/*
-	//		SpaceComponent
-	//		Questo localizzerà l'Entità a 10 unità in basso e a destra, dall'origine. Sarà larga 303 unità e alta 641 unità.
-	//	*/
-	//	city.SpaceComponent = common.SpaceComponent{
-	//		Position: engo.Point{cb.mouseTracker.MouseX, cb.mouseTracker.MouseY},
-	//		Width:    303,
-	//		Height:   641,
-	//	}
-	//
-	//	/*
-	//		Common.RenderComponent è un po 'complicato, in quanto richiede di definire una texture da disegnare e fornire un valore di scala (di solito solo engo.Point {1, 1}).
-	//		La funzione helper common.LoadedSprite(url string) fornirà un riferimento allo sprite precaricato durante la funzione Preload()
-	//	*/
-	//	texture, err := common.LoadedSprite("textures/city.png")
-	//	if err != nil {
-	//		log.Println("Unable to load texture: " + err.Error())
-	//	}
-	//
-	//	city.RenderComponent = common.RenderComponent{
-	//		Scale:    engo.Point{0.1, 0.1},
-	//		Drawable: texture,
-	//	}
-	//
-	//	/*
-	//		Ora che abbiamo completato l'Entità, va aggiunta ai sistemi appropriati:
-	//		Stiamo eseguendo il ciclo su tutti i sistemi noti per vedere se uno è di tipo common.RenderSystem.
-	//		In tal caso, stiamo usiamo il metodo Add specifico per RenderSystem per aggiungere la nostra city a quel sistema.
-	//		Questo sistema richiede tre parametri: puntatori a BasicEntity, RenderComponent e SpaceComponent.
-	//		Se dovessimo aggiungere la nostra città a più sistemi, potremmo semplicemente aggiungere ulteriori clausole case e chiamare le funzioni Add appropriate.
-	//	*/
-	//	for _, system := range cb.world.Systems() {
-	//
-	//		switch sys := system.(type) {
-	//		case *common.RenderSystem:
-	//			sys.Add(&city.BasicEntity, &city.RenderComponent, &city.SpaceComponent)
-	//		}
-	//	}
-	//
-	//}
 }
 
 func (cb *CityBuildingSystem) New(w *ecs.World) {
@@ -117,19 +120,7 @@ func (cb *CityBuildingSystem) New(w *ecs.World) {
 
 	fmt.Println("CityBuildingSystem was added to the Scene")
 
-	// engo.Input.RegisterButton("AddCity", engo.KeyF1)
-
 	Spritesheet = common.NewSpritesheetWithBorderFromFile("textures/citySheet.png", 16, 16, 1, 1)
-
-	// cb.mouseTracker.BasicEntity = ecs.NewBasic()
-	// cb.mouseTracker.MouseComponent = common.MouseComponent{Track: true}
-
-	// for _, system := range w.Systems() {
-	// 	switch sys := system.(type) {
-	// 	case *common.MouseSystem:
-	// 		sys.Add(&cb.mouseTracker.BasicEntity, &cb.mouseTracker.MouseComponent, nil, nil)
-	// 	}
-	// }
 
 	cb.updateBuildTime()
 }
