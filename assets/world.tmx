@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="2019.07.31" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="11">
+ <tileset firstgid="1" name="grass-tiles-2-small" tilewidth="32" tileheight="32" tilecount="72" columns="12">
+  <image source="grass-tiles-2-small.png" width="384" height="192"/>
+ </tileset>
+ <tileset firstgid="73" name="tree2-final" tilewidth="32" tileheight="32" tilecount="64" columns="8">
+  <image source="tree2-final.png" width="256" height="256"/>
+ </tileset>
+ <tileset firstgid="137" name="qubodup-bush_berries_0" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="qubodup-bush_berries_0.png" width="32" height="32"/>
+ </tileset>
+ <tileset firstgid="138" name="littleshrooms_0" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="littleshrooms_0.png" width="32" height="40"/>
+ </tileset>
+ <layer id="1" name="world" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eAHtmUtLBTEMhUfkiuJG3flYi///F9osDoSQtGmbdAp3FqWv9JwvfQx4vR3H8ZBQXopmrXwHej4FavG9qPFjrpbHaxIXZ/S0wVqra3l4PGZjPHtV48dcZB6kaeXl4dXWgrNW34rvY8Vb05VjUl/Oz/alvtafOQtNj8ZmueV6ywfj2ll4zh7rrVpyzPYtH4z3ngXWtWpwe/YEsVbd8qL5Vh5vJea3FI8Wj7GYRsa5rtXmefC9A//HQA7kNcJrrbHYMa69DdKiHEb5oW0xjYxD06r5WXD9n8Ez4D5cz9Pmd0HGc12tzfPAPaK3MHsW5CVZeL/GzOPQ1tj5GM/jL+AMuDYYImquq7XfCzvtf9QZwCOCnWtAd1XNvSPbq/jJJ5Jbaq3IQ3rKfu+bluuzc5B+Gf2I76a1Dxm80LQ8o8bhE1VHcXl1Zri9HllxM+x8bRZfS5czRLRbftHzo8yt72k0p6Y3yt6zTvONGOthiIiNYIZGBM+oBhi8Nf1NN+qVuQ78z4WPGD+V8lXGqNDc7O9nWbmAmzhXMLa+O1l5rta98tzz3a6+B16/M+9Lj3dPrDf3K+56K9cd8N+BnjfoifXE3Ov57Lw3O7Pd633ZJe/Mu5Gpvcv+ncmxan9X+Zyxl/S/rjN8Iz3p9/5/W6wiIA==
+  </data>
+ </layer>
+ <layer id="2" name="tree-bottom" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eAHt2MEJwCAQBED7NvoxSd1uWshLcYT9743CgaU4BAgQIECAAAECBM4TqBn5SlrSNx5/pPudPMm78RyqEyBAgAABAgQIECBAgAABAgQ+AX823gEBAgQIrCBgH61wCzoQ+C8wATY8DA0=
+  </data>
+ </layer>
+ <layer id="3" name="tree-top" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eAHtmddygzAQRf17OL3H6T2x4/T6lrylfHUOD8xgRoYVkgwKq5kzIIp0965kjUWvp0UdmHTgZ7JaWvstvduumz602ngTKvqQGkwehewvlEf/uV1TjmzizfKZHW3eLXs21ZVAH+ZgHhZgEZZgGWIpKwhdhTVYhw3YhC3YhljKAKE7sAt7sA8HcAhHEEs5RugJnMIZnMMFXMIV+Ciu80qiYchDI7iGMdzALdzBPcRSHhD6CE/wDC/wCm/wDrGXDwL4bHkQkt/vL2L4bnkcXZQnyV0XfdGYpzugY2a6N3pHHWiTA1Vztep+m2KJVYt6HGvmmtHd1fGSYLdkz2YW/49dMu9jz8ZnjHXHU1N7Nj5jT/Posmcj9U76nMu4GvLyCHTPxsXF8O/GsGcjcUG6Z+N7vpq0zaKPYr8JF/pQ9Q3Bx9wPGZ+P9ajoTRP1ptajurGmOTXl1WU9qtLiYyya+jDF4bIe5dvLn5v6Dn0t1m8Ied/y50W/bNejUGOoqMu2Ll2PsnbrxFHmY9punTYzPXpUB6QO/AGYpVJ4
+  </data>
+ </layer>
+ <objectgroup id="4" name="colisions">
+  <object id="3" x="1248.36" y="1151.82" width="127.636" height="64.5455"/>
+  <object id="4" x="288.182" y="1440.36" width="128.182" height="63.4545"/>
+  <object id="5" x="192.364" y="448" width="127.818" height="64.1818"/>
+ </objectgroup>
+</map>
