@@ -1,163 +1,151 @@
 package main
 
 import (
-	"image"
 	"image/color"
 
-	"github.com/matiux/matventure/entities"
-
-	"github.com/matiux/matventure/systems"
+	"github.com/matiux/matventure/entity"
 
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo"
 	"github.com/EngoEngine/engo/common"
 )
 
-const (
-	KeyboardScrollSpeed = 400
-	EdgeScrollSpeed     = KeyboardScrollSpeed
-	EdgeWidth           = 20
-	ZoomSpeed           = -0.125
+var (
+	heroWidth  = 52
+	heroHeight = 73
 )
 
 // Ogni Scene ha un solo World e questo World è una raccolta di System ed Entity.
-type myScene struct{}
+type MainScene struct{}
 
 // Type definisce in modo univoco il tuo tipo di gioco
-func (*myScene) Type() string { return "myGame" }
+func (*MainScene) Type() string { return "MainScene" }
 
-/*
-Preload viene chiamato prima di caricare qualsiasi risorsa dal disco, per consentire di registrarli / accodarli
-Il rendering di qualcosa consiste di tre cose (ECS):
-The System (RenderSystem, nello specifico)
-The Entity (puoi averne molte)
-Two Component (RenderComponent e SpaceComponent).
+func (*MainScene) Preload() {
 
-L'idea è che ci sono molte entità (oggetti). Questi possono avere valori e variabili diversi: formano i diversi componenti che ogni entità può avere.
-Le entità che hanno un componente SpaceComponent, ad esempio, hanno alcune informazioni sulla loro posizione (nel gamespace).
-Queste entità e componenti non fanno nulla. Sono solo contenitori di dati.
-Un componente può avere variabili (e valori per tali variabili) e un'entità è solo un []Component.
-Effettivamente fare qualcosa è permesso solo per i System(s). Possono cambiare / aggiungere / rimuovere entità, nonché cambiare / aggiungere / rimuovere qualsiasi componente su tali entità.
-Possono modificare valori come i valori di posizione all'interno di SpaceComponent.
-Puoi avere più System(s) e ognuno avrà il proprio compito. Ogni frame, questi sistemi sono chiamati in modo che possano fare le cose.
-Il RenderSystem è uno dei sistemi inclusi in Engo, che ha già molte chiamate OpenGL integrate.
-*/
-func (*myScene) Preload() {
-
-	engo.Files.Load("textures/citySheet.png", "textures/city.png", "tilemap/TrafficMap.tmx")
+	engo.Files.Load("world.tmx", "hero.png")
 }
 
-/*
-Setup viene chiamato prima dell'avvio del ciclo principale. Ti permette di aggiungere Entity e System alla tua scena.
-Per aggiungere il RenderSystem al nostro gioco, dobbiamo aggiungerlo all'interno della funzione Setup della nostra scena.
-Nello specifico, un'istanza di RenderSystem viene aggiunta al mondo di questa scena specifica.
-*/
-func (*myScene) Setup(u engo.Updater) {
+func (scene *MainScene) Setup(u engo.Updater) {
 
 	world, _ := u.(*ecs.World)
+	common.SetBackground(color.White)
 
-	resource, err := engo.Files.Resource("tilemap/TrafficMap.tmx")
-
-	if err != nil {
-		panic(err)
-	}
-
-	tmxResource := resource.(common.TMXResource)
-	levelData := tmxResource.Level
-
-	tiles := make([]*entities.Tile, 0)
-
-	for _, tileLayer := range levelData.TileLayers {
-
-		for _, tileElement := range tileLayer.Tiles {
-
-			if tileElement.Image != nil {
-
-				tile := &entities.Tile{BasicEntity: ecs.NewBasic()}
-				tile.RenderComponent = common.RenderComponent{
-					Scale:    engo.Point{1, 1},
-					Drawable: tileElement,
-				}
-
-				tile.SpaceComponent = common.SpaceComponent{
-					Position: tileElement.Point,
-					Width:    0,
-					Height:   0,
-				}
-
-				tiles = append(tiles, tile)
-			}
-		}
-	}
-
-	/*
-		Da notare che abbiamo aggiunto gli altri sistemi prima del CityBuildingSystem. Questo per garantire che tutti i sistemi dai quali potremmo
-		dipendere siano già inizializzati durante l'inizializzazione del CityBuildingSystem.
-	*/
 	world.AddSystem(&common.RenderSystem{})
 
-	/*
-		Per generare le Entity nel posto corretto (Sopra il mouse), dobbiamo sapere dove si trova il cursore. La nostra prima ipotesi potrebbe essere
-		quella di utilizzare la struttura engo.Input.Mouse che è disponibile. Tuttavia, questo restituisce la posizione effettiva (X, Y) relativa alla
-		dimensione dello schermo, non al sistema di griglie di gioco. Abbiamo uno speciale MouseSystem disponibile proprio per questo
+	scene.setupHero(world)
 
-		Il MouseSystem è principalmente scritto per tenere traccia degli eventi del mouse per le Entity; puoi verificare se la tua Entità è stata spostata,
-		cliccata, trascinata, ecc. Per usarla, abbiamo quindi bisogno di una Entity che utilizza il MouseSystem. Questo deve contenere un componente Mouse,
-		in cui verranno salvati i risultati / i dati.
-	*/
-	// world.AddSystem(&common.MouseSystem{})
-	world.AddSystem(&systems.CityBuildingSystem{})
-	world.AddSystem(common.NewKeyboardScroller(400, engo.DefaultHorizontalAxis, engo.DefaultVerticalAxis))
-	//world.AddSystem(&common.EdgeScroller{EdgeScrollSpeed, EdgeWidth})
+	//resource, err := engo.Files.Resource("world.tmx")
+	//if err != nil {
+	//	panic(err)
+	//}
+	//
+	//tmxResource := resource.(common.TMXResource)
+	//levelData := tmxResource.Level
+	//
+	//tiles := make([]*entity.Tile, 0)
+	//
+	//for _, tileLayer := range levelData.TileLayers {
+	//
+	//	name := tileLayer.Name
+	//	fmt.Println("Layer: " + name)
+	//	//fmt.Println(tileLayer.Properties)
+	//
+	//	for _, tileElement := range tileLayer.Tiles {
+	//
+	//		if tileElement.Image != nil {
+	//
+	//			tile := &entity.Tile{BasicEntity: ecs.NewBasic()}
+	//
+	//			tile.RenderComponent = common.RenderComponent{
+	//				Scale:    engo.Point{1, 1},
+	//				Drawable: tileElement,
+	//			}
+	//
+	//			tile.SpaceComponent = common.SpaceComponent{
+	//				Position: tileElement.Point,
+	//				Width:    0,
+	//				Height:   0,
+	//			}
+	//
+	//			if tileLayer.Name == "world" {
+	//				tile.RenderComponent.SetZIndex(0)
+	//			}
+	//
+	//			tiles = append(tiles, tile)
+	//		}
+	//	}
+	//
+	//	break
+	//}
+	//
+	//for _, system := range world.Systems() {
+	//	switch sys := system.(type) {
+	//	case *common.RenderSystem:
+	//		for _, v := range tiles {
+	//			sys.Add(&v.BasicEntity, &v.RenderComponent, &v.SpaceComponent)
+	//		}
+	//	}
+	//}
+	//common.CameraBounds = levelData.Bounds()
+}
 
-	engo.Input.RegisterButton("AddCity", engo.KeyF1)
+func (scene *MainScene) setupHero(world *ecs.World) {
 
-	/*
-		Poiché stiamo costruendo un HUD, non ci interessa quanto sia grande la nostra mappa di gioco.
-		Siamo interessati solo a quanto è grande la finestra stessa. Dovremo usare WindowHeight() e sottrarre l'altezza del nostro HUD.
-	*/
-	hud := entities.HUD{BasicEntity: ecs.NewBasic()}
-	hud.SpaceComponent = common.SpaceComponent{
-		Position: engo.Point{0, engo.WindowHeight() - 100},
-		Width:    350,
-		Height:   100,
-	}
+	spriteSheet := common.NewSpritesheetFromFile("hero.png", heroWidth, heroHeight)
 
-	hudImage := image.NewUniform(color.RGBA{205, 205, 205, 255})
-	hudNRGBA := common.ImageToNRGBA(hudImage, 350, 100)
-	hudImageObj := common.NewImageObject(hudNRGBA)
-	hudTexture := common.NewTextureSingle(hudImageObj)
+	x := engo.GameWidth() / 2
+	y := engo.GameHeight() / 2
 
-	hud.RenderComponent = common.RenderComponent{
-		Drawable: hudTexture,
-		Scale:    engo.Point{1, 1},
-		Repeat:   common.Repeat,
-	}
+	hero := scene.createHero(
+		engo.Point{x, y},
+		spriteSheet,
+	)
 
-	hud.RenderComponent.SetShader(common.HUDShader)
-	hud.RenderComponent.SetZIndex(1)
+	hero.RenderComponent.SetZIndex(1)
 
 	for _, system := range world.Systems() {
 		switch sys := system.(type) {
 		case *common.RenderSystem:
-			sys.Add(&hud.BasicEntity, &hud.RenderComponent, &hud.SpaceComponent)
-
-			for _, v := range tiles {
-				sys.Add(&v.BasicEntity, &v.RenderComponent, &v.SpaceComponent)
-			}
+			sys.Add(
+				&hero.BasicEntity,
+				&hero.RenderComponent,
+				&hero.SpaceComponent,
+			)
 		}
 	}
+}
 
-	common.CameraBounds = levelData.Bounds()
-	common.SetBackground(color.White)
+func (scene *MainScene) createHero(point engo.Point, spriteSheet *common.Spritesheet) *entity.Hero {
+
+	hero := &entity.Hero{BasicEntity: ecs.NewBasic()}
+
+	hero.SpaceComponent = common.SpaceComponent{
+		Position: point,
+		Width:    float32(heroWidth),
+		Height:   float32(heroHeight),
+	}
+
+	hero.RenderComponent = common.RenderComponent{
+		Drawable: spriteSheet.Cell(0),
+		Scale:    engo.Point{1, 1},
+	}
+
+	//hero.SpeedComponent = SpeedComponent{}
+	//hero.AnimationComponent = common.NewAnimationComponent(spriteSheet.Drawables(), 0.1)
+
+	//hero.AnimationComponent.AddAnimations(actions)
+	//hero.AnimationComponent.SelectAnimationByName("downstop")
+
+	return hero
 }
 
 func main() {
 	opts := engo.RunOptions{
-		Title:          "TrafficManager",
-		Width:          1600,
-		Height:         1300,
+		Title:          "Matventure",
+		Width:          1024,
+		Height:         768,
 		StandardInputs: true,
 	}
-	engo.Run(opts, new(myScene))
+	engo.Run(opts, new(MainScene))
 }

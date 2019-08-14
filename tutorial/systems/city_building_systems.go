@@ -1,15 +1,12 @@
 package systems
 
 import (
-	"fmt"
-	"math/rand"
-	"time"
-
-	"github.com/matiux/matventure/entities"
-
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo"
 	"github.com/EngoEngine/engo/common"
+
+	"math/rand"
+	"time"
 )
 
 // Spritesheet contains the sprites for the city buildings, cars, and roads
@@ -40,8 +37,7 @@ var cities = [...][12]int{
 		407, 187, 408,
 		444, 298, 445,
 	},
-	{
-		75, 76, 77,
+	{75, 76, 77,
 		186, 150, 188,
 		186, 150, 188,
 		297, 191, 299,
@@ -78,33 +74,38 @@ var cities = [...][12]int{
 	},
 }
 
-// type MouseTracker struct {
-// 	ecs.BasicEntity
-// 	common.MouseComponent
-// }
+// City is a city tile
+type City struct {
+	ecs.BasicEntity
+	common.RenderComponent
+	common.SpaceComponent
+}
 
+// CityBuildingSystem builds random cities as the game progresses
 type CityBuildingSystem struct {
 	world *ecs.World
-	// mouseTracker MouseTracker
 
-	usedTiles          []int
+	usedTiles []int
+
 	elapsed, buildTime float32
 	built              int
 }
 
-// Remove is called whenever an Entity is removed from the World,
-// in order to remove it from this sytem as well
-func (*CityBuildingSystem) Remove(ecs.BasicEntity) {}
+// New is the initialisation of the System
+func (cb *CityBuildingSystem) New(w *ecs.World) {
+	cb.world = w
 
-/*
-La funzione Update del nostro System CityBuilding viene chiamata ogni frame dal mondo
-`dt` è il tempo in secondi dall'ultimo fotogramma
-*/
+	Spritesheet = common.NewSpritesheetWithBorderFromFile("textures/citySheet.png", 16, 16, 1, 1)
 
+	rand.Seed(time.Now().UnixNano())
+
+	cb.updateBuildTime()
+}
+
+// Update is ran every frame, with `dt` being the time
+// in seconds since the last frame
 func (cb *CityBuildingSystem) Update(dt float32) {
-
 	cb.elapsed += dt
-
 	if cb.elapsed >= cb.buildTime {
 		cb.generateCity()
 		cb.elapsed = 0
@@ -113,75 +114,37 @@ func (cb *CityBuildingSystem) Update(dt float32) {
 	}
 }
 
-func (cb *CityBuildingSystem) New(w *ecs.World) {
+// Remove is called whenever an Entity is removed from the scene, and thus from this system
+func (*CityBuildingSystem) Remove(ecs.BasicEntity) {}
 
-	cb.world = w
-	rand.Seed(time.Now().UnixNano())
-
-	fmt.Println("CityBuildingSystem was added to the Scene")
-
-	Spritesheet = common.NewSpritesheetWithBorderFromFile("textures/citySheet.png", 16, 16, 1, 1)
-
-	cb.updateBuildTime()
-}
-
-func (cb *CityBuildingSystem) isTileUsed(tile int) bool {
-
-	for _, t := range cb.usedTiles {
-		if tile == t {
-			return true
-		}
-	}
-
-	return false
-}
-
+// generateCity randomly generates a city in a random location on the map
 func (cb *CityBuildingSystem) generateCity() {
-
 	x := rand.Intn(18)
 	y := rand.Intn(18)
 	t := x + y*18
 
 	for cb.isTileUsed(t) {
-
-		fmt.Printf("Tile usata: %v\n", t)
-
 		if len(cb.usedTiles) > 300 {
 			break //to avoid infinite loop
 		}
-
 		x = rand.Intn(18)
 		y = rand.Intn(18)
 		t = x + y*18
 	}
-
 	cb.usedTiles = append(cb.usedTiles, t)
 
 	city := rand.Intn(len(cities))
-	cityTiles := make([]*entities.City, 0)
-
-	fmt.Printf("x: %v | y: %v | tile: %v | city: %v, \n", x, y, t, city)
-
+	cityTiles := make([]*City, 0)
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 4; j++ {
-
-			tile := &entities.City{BasicEntity: ecs.NewBasic()}
-
-			x2 := float32(((x+1)*64)+8) + float32(i*16)
-			y2 := float32((y+1)*64) + float32(j*16)
-
+			tile := &City{BasicEntity: ecs.NewBasic()}
 			tile.SpaceComponent.Position = engo.Point{
-				X: x2,
-				Y: y2,
+				X: float32(((x+1)*64)+8) + float32(i*16),
+				Y: float32(((y + 1) * 64)) + float32(j*16),
 			}
-
-			index := cities[city][i+3*j]
-
-			tile.RenderComponent.Drawable = Spritesheet.Cell(index)
+			tile.RenderComponent.Drawable = Spritesheet.Cell(cities[city][i+3*j])
 			tile.RenderComponent.SetZIndex(1)
 			cityTiles = append(cityTiles, tile)
-
-			fmt.Printf("\t\tx2: %v | y2: %v | index: %v, \n", x2, y2, index)
 		}
 	}
 
@@ -193,12 +156,39 @@ func (cb *CityBuildingSystem) generateCity() {
 			}
 		}
 	}
+
+	engo.Mailbox.Dispatch(HUDTextMessage{
+		BasicEntity: ecs.NewBasic(),
+		SpaceComponent: common.SpaceComponent{
+			Position: engo.Point{X: float32((x + 1) * 64), Y: float32((y + 1) * 64)},
+			Width:    64,
+			Height:   64,
+		},
+		MouseComponent: common.MouseComponent{},
+		Line1:          "Town",
+		Line2:          "Just built!",
+		Line3:          "A town generates",
+		Line4:          "$100 per day.",
+	})
+
+	engo.Mailbox.Dispatch(CityUpdateMessage{
+		New: CityTypeNew,
+	})
+}
+
+func (cb *CityBuildingSystem) isTileUsed(tile int) bool {
+	for _, t := range cb.usedTiles {
+		if tile == t {
+			return true
+		}
+	}
+	return false
 }
 
 func (cb *CityBuildingSystem) updateBuildTime() {
 	switch {
 	case cb.built < 2:
-		cb.buildTime = 1*rand.Float32() + 3 // 10 to 15 seconds
+		cb.buildTime = 5*rand.Float32() + 10 // 10 to 15 seconds
 	case cb.built < 8:
 		cb.buildTime = 30*rand.Float32() + 60 // 60 to 90 seconds
 	case cb.built < 18:
